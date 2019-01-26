@@ -1,7 +1,7 @@
 ---
 title: "tidyverse_tutorial"
 author: "jh gil"
-date: "2019년 1월 27일"
+date: "2019년 01월 27일"
 output: html_document
 ---
 
