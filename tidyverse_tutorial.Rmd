@@ -1,0 +1,94 @@
+---
+title: "tidyverse_tutorial"
+author: "jh gil"
+date: "2019년 1월 27일"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Tidyverse Tutorial
+
+tidyverse 연습용 문서입니다.
+
+```{r}
+library(tidyverse)
+```
+
+## readr 패키지를 활용한 데이터 읽기
+
+read_csv 패키지는 데이터가 커질수록 상대적인 성능이 더욱 우수하다고 알려졌다.
+
+read_csv로 읽은 데이터는 data.frame이 아닌 tibble이라는 클래스로 저장이 된다.
+
+```{r}
+data <- read_csv('https://raw.githubusercontent.com/jinseob2kim/jinseob2kim.github.io/master/smc_example.csv')
+```
+
+```{r}
+# 특정 칼럼의 형태를 지정하고 싶을 때
+data <- read_csv('https://raw.githubusercontent.com/jinseob2kim/jinseob2kim.github.io/master/smc_example.csv',
+                 col_types = cols(Patient_ID = col_character(), HTN = "c"))
+```
+
+```{r}
+data
+```
+
+```{r}
+# read_csv로 읽은 데이터는 data.frame이 아닌 tibble이라는 클래스로 저장이 된다.
+class(data)
+```
+
+## 파이프 오퍼레이터
+
+tidyverse의 하이라이트는 단연 '%>%' (파이프오퍼레이터, 단축기 Ctrl + Shift + M)
+
+기본적인 공식은 아래와 같다.
+
+- function(X, Y) == X %>% function(Y)
+
+- function(Y, X) == X %>% function(Y, .)
+
+```{r}
+data %>% head # head(data)
+```
+
+```{r}
+data %>% head(n=10)
+```
+
+```{r}
+10 %>% head(data, .)
+```
+
+```{r}
+data %>% subset(Sex=='M') %>% head # head(subset(data, Sex == "M"))
+```
+
+## tidyverse vs general code
+
+%>% 연산자를 활용하면 직관적인 코드 작성이 가능하다.
+
+%>% 오퍼레이터를 이용하는 경우와 일반적인 코드 작성의 차이를 알아보자
+
+예시는 data 중 남성을 대상으로 DM 여부를 예측하는 Logistic regression 모델을 생성하는 코드이다.
+
+```{r}
+# 일반적인 R 코드작성
+data_m <- subset(data, Sex == "M")
+model <- glm(DM ~ Age + Weight + BMI, data = data_m, family = "binomial")
+summ_model <- summary(model)
+summ_model$coefficients
+```
+
+```{r}
+# tidyverse 스타일
+data %>%
+  filter(Sex == "M") %>% 
+  glm(DM ~ Age + Weight + BMI, data = ., family = "binomial") %>%
+  summary %>% 
+  .$coefficient
+```
